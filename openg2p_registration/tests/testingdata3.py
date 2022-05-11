@@ -1,0 +1,96 @@
+testing_data3={
+   "__id":"uuid:eaad6ad2-c993-4f2c-ae66-bde8f3bea91e",
+   "start":"2022-04-29T00:03:23.652+05:30",
+   "gzipped":"0",
+   "json":"1",
+   "json_path":"$.address",
+   "client":"None",
+   "end":"2022-04-29T00:03:46.456+05:30",
+   "__system":{
+      "submissionDate":"2022-04-28T18:33:48.314Z",
+      "submitterId":"83",
+      "submitterName":"Demo",
+      "attachmentsPresent":0,
+      "attachmentsExpected":0,
+      "status":"None",
+      "reviewState":"None",
+      "deviceId":"collect:c5GZ1RraZ7FVj0Yf",
+      "edits":0
+   },
+   "group_ey66y74":{
+      "id":"5835629416921791",
+      "information":"None",
+      "fullName":"MURALITHARAN",
+      "Tirahan":"None",
+      "address":"UPKAR ROYAL GARDEN",
+      "locality":"Electronics City",
+      "city":"Bengaluru",
+      "state":"Karnataka",
+      "postalCode":"560100",
+      "dateOfBirth":"1979/01/01",
+      "gender":"Male",
+      "phone":"9980514521",
+      "email":"MURALITHARAN@MOSIP.IO",
+      "bank_account_number":"None",
+      "bank_Name":"None",
+      "BBAN":"CH59 0900 0000 8005 0555 2",
+      "chiefdom":"UPKAR ROYAL GARDEN",
+      "district":"Electronics City",
+      "birthday":"1979/01/01",
+      "zip":"560100",
+      "name":"MURALITHARAN",
+      "external_id":"5835629416921791",
+      "country":"India",
+      "add_ext":"@pnb",
+      "payment_address":"9980514521@pnb",
+      "grand_total":"36",
+      "currency":"Phillipines currency"
+   },
+   "group_fo2et49":{
+      "status_sibil":"None",
+      "age":"None",
+      "Suffix":"None",
+      "referring_party":"None"
+   },
+   "group_tl6wr26":{
+      "fohna":"None",
+      "plhiv":"None",
+      "pwd":"None",
+      "sc":"None",
+      "wedc":"None",
+      "ynsp":"None",
+      "sub_category":"None",
+      "sub_1":"None",
+      "Sub_2":"None",
+      "Sub_3":"None",
+      "others":"None"
+   },
+   "group_bg3er45":{
+      "panglan":"None",
+      "last_name_client":"None",
+      "given_name_client":"None",
+      "middle_name_client":"None",
+      "extension_client":"None",
+      "address_client":"None",
+      "contact_client":"None",
+      "relationship":"None"
+   },
+   "group_ab5cd69":{
+      "problem":"None",
+      "wroker_assessment":"None",
+      "recommendations":"None",
+      "signature_widget":"None"
+   },
+   "group_bc2eb46":{
+      "benef_id":"None",
+      "types_of_assistance":"None",
+      "assessment@odata.navigationLink":"Submissions('uuid%3Aeaad6ad2-c993-4f2c-ae66-bde8f3bea91e')/group_bc2eb46/assessment"
+   },
+   "meta":{
+      "instanceID":"uuid:eaad6ad2-c993-4f2c-ae66-bde8f3bea91e"
+   },
+   "odk_batch_id":"266d9f7f67944170b439aaff9ca68e30",
+   "program_ids":[
+      4
+   ]
+}

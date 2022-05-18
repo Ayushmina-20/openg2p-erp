@@ -129,6 +129,8 @@ class ODKSubmissions(models.Model):
                     {
                         "odk_batch_id": odk_batch_id,
                         "program_ids": odk_config.program_id.ids,
+                        "autodedup_id": odk_config.autodedup_id,
+                        "next_stage": odk_config.next_stage,
                     }
                 )
                 registration = self.create_registration_from_submission(value)

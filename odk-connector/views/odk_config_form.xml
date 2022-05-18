@@ -21,6 +21,8 @@
                         <group>
                             <field name="program_id"/>
                             <field name="program_enroll_date"/>
+                            <field name="autodedup_id" widget="selection"/>
+                            <field name="next_stage" widget="selection"/>
                         </group>
                     </group>
                 </sheet>

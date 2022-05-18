@@ -8,6 +8,7 @@
                 groups="openg2p_registration.group_openg2p_registration_user,openg2p.group_openg2p_manager,openg2p.group_openg2p_officer"
                 sequence="80"/>
 
+
         <menuitem id="menu_openg2p_registration_configuration" name="Configuration" parent="menu_openg2p_registration_root"
                   sequence="100"/>
 

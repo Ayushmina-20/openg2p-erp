@@ -52,6 +52,32 @@ class ODKConfig(models.Model):
         store=True,
         required=True,
     )
+
+    autodedup_id = fields.Selection(
+        [
+            ("1", "Next Field:KYC Action:Merge"),
+            ("2", "Next Field:KYC Action:Delete old data"),
+            ("3", "Next Field:KYC Action:Delete new data"),
+            ("4", "Next Field:External id Action:merge"),
+            ("5", "Next Field:External id Action:Delete old data"),
+            ("6", "Next Field:External id Action:Delete new data"),
+        ],
+        string="Autodedup Configuration",
+        required=True,
+    )
+
+    next_stage = fields.Selection(
+        [
+            ("1", "New Stage"),
+            ("3", "Verifying"),
+            ("4", "Approving"),
+            ("5", "Accessing"),
+            ("6", "Registered"),
+        ],
+        string="Next Stage",
+        required=True,
+    )
+
     program_enroll_date = fields.Date(
         "Program Enrollment Date", default=fields.Date.today()
     )

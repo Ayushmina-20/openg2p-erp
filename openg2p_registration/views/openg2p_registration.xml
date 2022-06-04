@@ -53,10 +53,10 @@
                                 attrs="{'invisible': ['|', '|', ('stage_action', '!=', 'create_beneficiary'),('beneficiary_id', '!=', False),('active', '=', False)]}"/>
                         <button string="Check Duplicates" name="find_duplicates" type="object"
                                 class="oe_highlight"
-                                attrs="{'invisible': ['|', '|', ('stage_id', '!=', 2),('duplicate_beneficiaries_ids', '!=', []),('active', '=', False)]}"/>
+                                attrs="{'invisible': ['|', '|', ('stage_id', '!=', 3),('duplicate_beneficiaries_ids', '!=', []),('active', '=', False)]}"/>
                         <button string="Merge" name="merge_beneficiaries" type="object"
                                 class="oe_highlight"
-                                attrs="{'invisible': [ '|','|', ('stage_id', '!=', 2),('active', '=', False),('duplicate_beneficiaries_ids', '=', [])]}"/>
+                                attrs="{'invisible': [ '|','|', ('stage_id', '!=', 3),('active', '=', False),('duplicate_beneficiaries_ids', '=', [])]}"/>
                         <button string="Refuse" name="archive_registration" type="object"
                                 attrs="{'invisible': [('active', '=', False)]}"/>
                         <field name="stage_id" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"
@@ -457,6 +457,7 @@
             <field name="name">Registrations</field>
             <field name="res_model">openg2p.registration</field>
             <field name="view_mode">kanban,tree,form,pivot,graph,calendar,activity</field>
+            <field name="limit">20</field>
             <field name="search_view_id" ref="view_crm_case_beneficiaries_filter"/>
             <field name="context">{}</field>
             <field name="help" type="html">

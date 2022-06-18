@@ -370,6 +370,41 @@ class Registration(models.Model):
                     res.append(rec.id)
         return [("id", "in", res)]
 
+    def create_registration(self,data):
+        regd_data={
+            "firstname":data.firstname,
+            "lastname":data.lastname,
+            "othernames": data.othernames or None,
+            #"location_id": data.location_id.id or None,
+            "street": data.street or None,
+            "street2": data.street2 or None,
+            "city": data.city or None,
+            #"state_id": data.state_id.id or None,
+            "zip": data.zip or None,
+            #"country_id": data.country_id.id or None,
+            "phone": data.phone or None,
+            "mobile": data.mobile or None,
+            "email": data.email or None,
+            "title": data.title.id or None,
+            "lang": data.lang or None,
+            "gender": data.gender or None,
+            "birthday": data.birthday or None,
+            "marital": data.marital or None,
+            "national_id": data.identity_national or None,
+            "passport_id": data.identity_passport or None,
+            "bank_account_id": data.bank_account_id.id or None,
+            "emergency_contact": data.emergency_contact or None,
+            "emergency_phone": data.emergency_phone or None,
+            "odk_batch_id": data.odk_batch_id or None,
+        }
+        try:
+            regd=self.create(regd_data)
+        except BaseException as e:
+            _logger.error(e)
+            return None
+
+        return regd
+
     # example for filtering on org custom fields
     def _search_r_and_p(self, operator, val2):
         res = []

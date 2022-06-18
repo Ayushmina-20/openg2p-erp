@@ -170,7 +170,7 @@ class ODKSubmissions(models.Model):
         # res.update(extra_data)
         # registration = self.env['openg2p.registration'].create(res)
         try:
-            data=self.main_mapping(data)
+            data=self.env["mapping.odk_submissions"].main_mapping(data)
             registration = self.env[
                 "openg2p.registration"
             ].create_registration_for_single_submission(data)

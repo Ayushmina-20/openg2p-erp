@@ -7,14 +7,76 @@ AVAILABLE_PRIORITIES = [("0", "Urgent"), ("1", "High"), ("2", "Normal"), ("3", "
 class RegistrationService(models.Model):
     _inherit = ["openg2p.registration"]
 
-    def create_registration_for_single_submission(self, odk_data):
-        #odk data should contain all the submission fields
-        registration=odk_data
-        #autodedup configuration
-        #write registration
+    def create_registration_for_single_submission(self,regd, odk_data):
+        #self.create_registration(regd,odk_data)
+        current_program_id = int(
+            odk_data["program_ids"][len(odk_data["program_ids"]) - 1]
+        )
+        program_obj = self.env["openg2p.program"].search(
+            [("id", "=", current_program_id)]
+        )
+        autodedup_field = program_obj.autodedup_field
+        action = program_obj.action
+        stage_name = program_obj.stage_name
 
 
+        # if os.getenv("SHOULD_DEMO_AUTH", "true").lower() == "true":
+        #     demo_auth_res = self.demo_auth(temp)
+        # kyc_id is identity number and category type is kyc_type id number
+        #kyc_id is identity number and category type is kyc_type id number
+        if autodedup_field == "kyc":
+            kycdup_list = self.post_auth_find_duplicate_beneficiary(
+                self,regd["kyc_id"],"KYC_TYPE_CATEGORY_ID_NUMBER")
 
+            if len(kycdup_list.ids) != 0:
+                if action == "merge":
+                    # merging the existing ones with new one and passing the existing_id and current_id as arguments
+                    self.merge_registrations(regd, kycdup_list.ids[0])
+                elif action == "del_old":
+                    # deleting the old registration
+                    duplicate_kyc =kycdup_list
+                    duplicate_kyc.active = False
+                    # deleting the old beneficiary
+                    duplicate_kyc_bene = kycdup_list.beneficiary_id
+
+                    duplicate_kyc_bene.active = False
+                    # creating registration for new record
+                    self.create_registration(regd,odk_data)
+                elif action == "del_new":
+                    print("kyc and delete new")
+                    # deleting the current record
+            else:
+                self.create_registration(regd,odk_data)
+        if autodedup_field == "ext_id":
+            externaldup_list = (
+            self.env["openg2p.registration"]
+                .search([("external_id", "=", regd["external_id"])])
+                .ids
+        )
+        if len(externaldup_list) != 0:
+            if action == "merge":
+                # merging the existing ones with new one and passing the existing_id and current_id as arguments
+                self.merge_registrations(regd, externaldup_list[0])
+            elif action == "del_old":
+                # deleting the old registration
+                duplicate_external = self.env["openg2p.registration"].search(
+                    [("external_id", "=", regd["external_id"])]
+                )
+                duplicate_external.active = False
+                # deleting the old beneficiary
+                duplicate_external_bene = self.env["openg2p.beneficiary"].search(
+                    [("external_id", "=", regd["external_id"])]
+                )
+                duplicate_external_bene.active = False
+                # creating registration for new record
+                self.create_registration(regd,odk_data,stage_name)
+            elif action == "del_new":
+                print("External id & delete new")
+            else:
+                self.create_registration(regd,odk_data,stage_name)
+
+        else:
+            self.create_registration(regd,odk_data,stage_name)
 
 
     def create_disbursement_fields(self, rid, temp, regd):
@@ -87,8 +149,6 @@ class RegistrationService(models.Model):
                                 }
                             )
                         data["bank_account_id"] = res.id
-                elif k == "phone":
-                    data["phone"] = odk_data["phone"]
                 elif hasattr(self, k):
                     if k == "partner_id":
                         res = self.env["res.partner"].search(
@@ -177,3 +237,41 @@ class RegistrationService(models.Model):
             print(e)
 
         return regd
+
+    def create_registration(self,data,temp,stage_name):
+
+        try:
+            data["stage_id"]=stage_name
+            regd=self.create(data)
+            rid = regd.id
+            self.create_disbursement_fields(rid, temp, regd)
+        except BaseException as e:
+            _logger.error(e)
+            return None
+
+        return regd
+
+    def merge_registrations(self, temp, old_id):
+        # Browsing that existing beneficiary
+        # existing_registration = self.env["openg2p.registration"].search([("id","=",int(old_id))])
+        existing_registration = self.env["openg2p.registration"].browse(old_id)
+
+        # Fields to be merged
+        overwrite_data = {
+            "street": (temp["chiefdom"] if "chiefdom" in temp.keys() else "-"),
+            "street2": (temp["district"] if "district" in temp.keys() else "-")
+                       + ", "
+                       + (temp["region"] if "region" in temp.keys() else "-"),
+            "city": (
+                    (temp["city"] if "city" in temp.keys() else "Freetown") or "Freetown"
+            ),
+            "phone": temp["phone"] or None,
+
+            "external_id": temp["external_id"] or None,
+        }
+
+        # Removing None fields
+        cleaned_overwrite_data = self.del_none(overwrite_data)
+
+        # Merging specfic fields to beneficiary
+        existing_registration.write(cleaned_overwrite_data)

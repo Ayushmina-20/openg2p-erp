@@ -334,6 +334,9 @@ class Beneficiary(models.Model):
 
     org_custom_field = fields.One2many("openg2p.beneficiary.orgmap", "beneficiary_id")
 
+    external_id=fields.Char(string="External ID")
+    kyc_id=fields.Char(string="KYC ID")
+
     def api_json(self):
         return {
             "id": self.id,

@@ -7,6 +7,14 @@ AVAILABLE_PRIORITIES = [("0", "Urgent"), ("1", "High"), ("2", "Normal"), ("3", "
 class RegistrationService(models.Model):
     _inherit = ["openg2p.registration"]
 
+    def post_auth_find_duplicate_beneficiary(self, auth_id, auth_id_type):
+        type_code_id = self.env["openg2p.beneficiary.id_category"].search(
+            [("code", "=", auth_id_type)], limit=1).id
+        kycdup_list = (self.env["openg2p.beneficiary.id_number"].search(
+            [("name", "=", auth_id), ("category_id", "=", type_code_id)]))
+        _logger.info(f"auth_id : {auth_id}. Post Auth. Size of duplicates: {kycdup_list}")
+        return kycdup_list
+
     def create_registration_for_single_submission(self,regd, odk_data):
         #self.create_registration(regd,odk_data)
         current_program_id = int(
@@ -24,10 +32,10 @@ class RegistrationService(models.Model):
         #     demo_auth_res = self.demo_auth(temp)
         # kyc_id is identity number and category type is kyc_type id number
         #kyc_id is identity number and category type is kyc_type id number
+        auth_response={"authId":regd["kyc_id"],"authIdType":"KYC_TYPE"}
         if autodedup_field == "kyc":
             kycdup_list = self.post_auth_find_duplicate_beneficiary(
-                self,regd["kyc_id"],"KYC_TYPE_CATEGORY_ID_NUMBER")
-
+                self,regd["kyc_id"],"KYC_TYPE")
             if len(kycdup_list.ids) != 0:
                 if action == "merge":
                     # merging the existing ones with new one and passing the existing_id and current_id as arguments
@@ -41,13 +49,13 @@ class RegistrationService(models.Model):
 
                     duplicate_kyc_bene.active = False
                     # creating registration for new record
-                    self.create_registration(regd,odk_data)
+                    self.create_registration(regd,odk_data,auth_response)
                 elif action == "del_new":
                     print("kyc and delete new")
                     # deleting the current record
             else:
-                self.create_registration(regd,odk_data)
-        if autodedup_field == "ext_id":
+                self.create_registration(regd,odk_data,auth_response)
+        elif autodedup_field == "ext_id":
             externaldup_list = (
             self.env["openg2p.registration"]
                 .search([("external_id", "=", regd["external_id"])])
@@ -69,17 +77,17 @@ class RegistrationService(models.Model):
                 )
                 duplicate_external_bene.active = False
                 # creating registration for new record
-                self.create_registration(regd,odk_data,stage_name)
+                self.create_registration(regd,odk_data,stage_name,auth_response)
             elif action == "del_new":
                 print("External id & delete new")
             else:
-                self.create_registration(regd,odk_data,stage_name)
+                self.create_registration(regd,odk_data,stage_name,auth_response)
 
         else:
-            self.create_registration(regd,odk_data,stage_name)
+            self.create_registration(regd,odk_data,stage_name,auth_response)
 
 
-    def create_disbursement_fields(self, rid, temp, regd):
+    def create_disbursement_fields(self, rid, temp, regd,auth_response):
         from datetime import datetime
 
         data = {}
@@ -232,19 +240,22 @@ class RegistrationService(models.Model):
             regd.write(data)
             # Updating Program for Registration
             regd.program_ids = [(6, 0, temp["program_ids"])]
+            regd.post_auth_create_id(auth_response)
+            if temp["stage_id"] == 6:
+                regd.create_beneficiary_from_registration()
 
         except BaseException as e:
             print(e)
 
         return regd
 
-    def create_registration(self,data,temp,stage_name):
+    def create_registration(self,data,temp,stage_name,auth_response):
 
         try:
             data["stage_id"]=stage_name
             regd=self.create(data)
             rid = regd.id
-            self.create_disbursement_fields(rid, temp, regd)
+            self.create_disbursement_fields(rid, temp, regd,auth_response)
         except BaseException as e:
             _logger.error(e)
             return None
@@ -275,3 +286,15 @@ class RegistrationService(models.Model):
 
         # Merging specfic fields to beneficiary
         existing_registration.write(cleaned_overwrite_data)
+
+    def post_auth_create_id(self, response):
+        return self.env["openg2p.registration.identity"].create({
+            "name": response["authId"],
+            "type": response["authIdType"],
+            "registration_id": self.id
+        })
+        res = self.env["openg2p.registration.identity"].search(
+            [("registration_id", "=", self.id)]
+        )
+        if res:
+            self.write({"identities": res.ids})

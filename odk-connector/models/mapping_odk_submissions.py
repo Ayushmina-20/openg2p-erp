@@ -74,6 +74,7 @@ class MappingService(models.Model):
                     "external_id":
                          (temp["new_emis_code"] if "new_emis_code" in temp.keys() else None),
                     "phone":temp["phone"],
+                    "kyc_id":temp["bban"]
                     # "stage_id": (
                     #     temp["stage_id"]
                     #     if "stage_id" in temp.keys()
